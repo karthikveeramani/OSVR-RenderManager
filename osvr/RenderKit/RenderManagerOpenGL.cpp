@@ -23,8 +23,13 @@ Sensics, Inc.
 // limitations under the License.
 
 #include "RenderManagerOpenGLVersion.h"
+#include <osvr/Util/PlatformConfig.h>
+
+#if !defined(OSVR_ANDROID)
 #include <SDL.h>
 #include "RenderManagerSDLInitQuit.h"
+#endif // #if !defined(OSVR_ANDROID)
+
 #include <osvr/Util/Finally.h>
 
 // clang-format off
@@ -49,6 +54,7 @@ Sensics, Inc.
 #include <Eigen/Geometry>
 
 
+#if !defined(OSVR_ANDROID)
 //==========================================================================
 // In case the caller does not specify an OpenGL toolkit to use, we use this
 // SDL-based toolkit by default.
@@ -262,6 +268,8 @@ public:
   }
 };
 
+#endif // #if !defined(OSVR_ANDROID)
+
 //==========================================================================
 // Vertex and fragment shaders to perform our combination of asynchronous
 // time warp and distortion correction.
@@ -368,8 +376,10 @@ namespace renderkit {
         if (p.m_graphicsLibrary.OpenGL && p.m_graphicsLibrary.OpenGL->toolkit) {
           m_toolkit = *p.m_graphicsLibrary.OpenGL->toolkit;
         } else {
+#if !defined(OSVR_ANDROID)
           SDLToolkitImpl *SDLToolKit = new SDLToolkitImpl(m_log);
           m_toolkit = *SDLToolKit->getToolkit();
+#endif // #if !defined(OSVR_ANDROID)
         }
 
         // Construct the appropriate GraphicsLibrary pointer.
@@ -916,7 +926,7 @@ namespace renderkit {
             // Construct the geometry we're going to render into the eyes
             glGenVertexArrays(1, &meshBuffer.VAO);
             glBindVertexArray(meshBuffer.VAO);
-            
+
             glGenBuffers(1, &meshBuffer.vertexBuffer);
             glBindBuffer(GL_ARRAY_BUFFER, meshBuffer.vertexBuffer);
             glBufferData(GL_ARRAY_BUFFER,

@@ -170,7 +170,7 @@ endif()
 
 #-----------------------------------------------------------------------------
 # OpenGL library as a stand-alone renderer not wrapping D3D
-if ( ( (OPENGL_FOUND AND GLEW_FOUND) OR OPENGLES2_FOUND ) AND SDL2_FOUND)
+if ( ( (OPENGL_FOUND AND GLEW_FOUND) OR OPENGLES2_FOUND ) AND (ANDROID OR SDL2_FOUND))
 	list(APPEND RenderManager_SOURCES osvr/RenderKit/RenderManagerOpenGL.cpp osvr/RenderKit/RenderManagerOpenGL.h osvr/RenderKit/RenderManagerOpenGLC.cpp)
 	message(STATUS " - OpenGL support: enabled")
 	set(RM_USE_OPENGL TRUE)
@@ -385,7 +385,9 @@ endif()
 # The goal with this variable is so that the same CMakeLists file that is used to build
 # the examples in-tree can be shipped to build the examples out-of-tree.
 set(OSVRRM_INSTALL_EXAMPLES ON)
-add_subdirectory(examples)
+if(NOT ANDROID)
+    add_subdirectory(examples)
+endif()
 
 install(TARGETS
 	osvrRenderManager

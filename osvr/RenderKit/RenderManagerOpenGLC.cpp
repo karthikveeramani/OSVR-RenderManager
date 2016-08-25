@@ -23,7 +23,18 @@
 // limitations under the License.
 
 // Internal Includes
-#include <GL/glew.h>
+#include "RenderManagerOpenGLVersion.h"
+#ifdef OSVR_RM_USE_OPENGLES20
+    #define glDeleteVertexArrays glDeleteVertexArraysOES
+    #define glGenVertexArrays glGenVertexArraysOES
+    #define glBindVertexArray glBindVertexArrayOES
+#else
+    #include <GL/glew.h>
+    #ifdef _WIN32
+        #include <GL/wglew.h>
+    #endif
+#endif
+
 #include <osvr/RenderKit/RenderManagerOpenGLC.h>
 #include <osvr/RenderKit/RenderManager.h>
 #include <osvr/RenderKit/RenderManagerImpl.h>
@@ -153,11 +164,15 @@ OSVR_ReturnCode osvrRenderManagerCreateColorBufferOpenGL(
     GLint internalFormat;
     switch (format) {
     case GL_RGBA:
+#if !defined(OSVR_RM_USE_OPENGLES20) && !defined(OSVR_RM_USE_OPENGLES30)
     case GL_BGRA:
+#endif
       internalFormat = GL_RGBA;
       break;
     case GL_RGB:
+#if !defined(OSVR_RM_USE_OPENGLES20) && !defined(OSVR_RM_USE_OPENGLES30)
     case GL_BGR:
+#endif
       internalFormat = GL_RGB;
       break;
     case GL_LUMINANCE:
