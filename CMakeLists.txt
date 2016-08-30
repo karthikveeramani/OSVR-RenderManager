@@ -250,21 +250,6 @@ if (SDL2_FOUND)
 endif()
 
 #-----------------------------------------------------------------------------
-# OpenGL library as a stand-alone renderer not wrapping D3D
-if ( ( (OPENGL_FOUND AND GLEW_FOUND) OR OPENGLES2_FOUND ) AND (ANDROID OR SDL2_FOUND))
-	list(APPEND RenderManager_SOURCES osvr/RenderKit/RenderManagerOpenGL.cpp osvr/RenderKit/RenderManagerOpenGL.h osvr/RenderKit/RenderManagerOpenGLC.cpp)
-	message(STATUS " - OpenGL support: enabled")
-	set(RM_USE_OPENGL TRUE)
-	set(OSVRRM_HAVE_OPENGL_SUPPORT ON)
-    if (OPENGLES2_FOUND AND ANDROID)
-		message(STATUS " - OpenGLES2 support: enabled")
-		set(RM_USE_OPENGLES20 TRUE)
-	endif()
-else()
-	message(STATUS " - OpenGL support: disabled)")
-endif()
-
-#-----------------------------------------------------------------------------
 # OpenGL wrapped around Direct3D
 if ((RM_USE_NVIDIA_DIRECT_D3D11 OR RM_USE_AMD_DIRECT_D3D11) AND NOT RM_USE_OPENGLES20)
 	#-----------------------------------------------------------------------------

@@ -273,6 +273,46 @@ public:
 //==========================================================================
 // Vertex and fragment shaders to perform our combination of asynchronous
 // time warp and distortion correction.
+#ifdef OSVR_RM_USE_OPENGLES20
+
+static const GLchar* distortionVertexShader =
+    "#version 100\n"
+    "attribute vec4 position;\n"
+    "attribute vec2 textureCoordinateR;\n"
+    "attribute vec2 textureCoordinateG;\n"
+    "attribute vec2 textureCoordinateB;\n"
+    "uniform mat4 projectionMatrix;\n"
+    "uniform mat4 modelViewMatrix;\n"
+    "uniform mat4 textureMatrix;\n"
+    "varying vec2 warpedCoordinateR;\n"
+    "varying vec2 warpedCoordinateG;\n"
+    "varying vec2 warpedCoordinateB;\n"
+    "void main()\n"
+    "{\n"
+    "   gl_Position = projectionMatrix * modelViewMatrix * position;\n"
+    "   warpedCoordinateR = vec2(textureMatrix * "
+    "      vec4(textureCoordinateR,0,1));\n"
+    "   warpedCoordinateG = vec2(textureMatrix * "
+    "      vec4(textureCoordinateG,0,1));\n"
+    "   warpedCoordinateB = vec2(textureMatrix * "
+    "      vec4(textureCoordinateB,0,1));\n"
+    "}\n";
+
+static const GLchar* distortionFragmentShader =
+    "#version 100\n"
+    "precision highp float;\n"
+    "uniform sampler2D tex;\n"
+    "varying vec2 warpedCoordinateR;\n"
+    "varying vec2 warpedCoordinateG;\n"
+    "varying vec2 warpedCoordinateB;\n"
+    "void main()\n"
+    "{\n"
+    "    gl_FragColor.r = texture2D(tex, warpedCoordinateR).r;\n"
+    "    gl_FragColor.g = texture2D(tex, warpedCoordinateG).g;\n"
+    "    gl_FragColor.b = texture2D(tex, warpedCoordinateB).b;\n"
+    "}\n";
+
+#else // #ifdef OSVR_RM_OPENGLES20
 static const GLchar* distortionVertexShader =
     "#version 330 core\n"
     "layout(location = 0) in vec4 position;\n"
@@ -309,6 +349,7 @@ static const GLchar* distortionFragmentShader =
     "    color.g = texture(tex, warpedCoordinateG).g;\n"
     "    color.b = texture(tex, warpedCoordinateB).b;\n"
     "}\n";
+#endif // #ifndef OSVR_RM_OPENGLES20
 
 static bool checkShaderError(GLuint shaderId, osvr::util::log::LoggerPtr m_log) {
     GLint result = GL_FALSE;
@@ -657,6 +698,13 @@ namespace renderkit {
             ret.status = FAILURE;
             return ret;
         }
+
+#ifdef OSVR_RM_USE_OPENGLES20
+        glBindAttribLocation(vertexShaderId, 0, "position");
+        glBindAttribLocation(vertexShaderId, 1, "textureCoordinateR");
+        glBindAttribLocation(vertexShaderId, 2, "textureCoordinateG");
+        glBindAttribLocation(vertexShaderId, 3, "textureCoordinateB");
+#endif
 
         fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(fragmentShaderId, 1, &distortionFragmentShader, nullptr);

@@ -186,7 +186,7 @@ OSVR_ReturnCode osvrRenderManagerCreateColorBufferOpenGL(
         " pixel format" << std::endl;
       return OSVR_RETURN_FAILURE;
     }
-    
+
     glGenTextures(1, colorBufferNameOut);
     glBindTexture(GL_TEXTURE_2D, *colorBufferNameOut);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, format, GL_UNSIGNED_BYTE, 0);
@@ -208,7 +208,7 @@ OSVR_ReturnCode osvrRenderManagerCreateDepthBufferOpenGL(
     glGetError(); // clear the error queue
     glGenRenderbuffers(1, depthBufferNameOut);
     glBindRenderbuffer(GL_RENDERBUFFER, *depthBufferNameOut);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
 
     return glGetError() == GL_NO_ERROR ? OSVR_RETURN_SUCCESS : OSVR_RETURN_FAILURE;
 }
